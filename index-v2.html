@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>56个民族 · 敦煌图鉴</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div class="dunhuang-canvas"></div>
+  <div class="silk-bottom"></div>
+
+  <canvas id="mainCanvas"></canvas>
+
+  <div id="topBar">
+    <span id="groupName">—</span>
+    <span id="newBadge" class="hidden">✦ 新解锁</span>
+    <span id="groupSub"></span>
+  </div>
+
+  <!-- 左：详情 -->
+  <div id="detailBar" class="side-bar">
+    <button class="ctrl-btn" data-action="info"><span class="ctrl-icon">&#128196;</span><span class="ctrl-label">详情</span></button>
+  </div>
+  <!-- 中：邂逅圆盘 -->
+  <button class="ctrl-btn draw-btn" data-action="draw">
+    <span class="ctrl-icon ctrl-icon-draw">&#10022;</span>
+    <span class="draw-label">邂逅</span>
+    <span class="draw-progress" id="drawProgress">0/56</span>
+  </button>
+  <!-- 右：图鉴 -->
+  <div id="albumBar" class="side-bar">
+    <button class="ctrl-btn" data-action="album"><span class="ctrl-icon">&#10070;</span><span class="ctrl-label">图鉴</span></button>
+  </div>
+
+  <div id="infoCard" class="hidden">
+    <div class="info-panel">
+      <div class="info-corner info-corner-tl"></div>
+      <div class="info-corner info-corner-tr"></div>
+      <div class="info-corner info-corner-bl"></div>
+      <div class="info-corner info-corner-br"></div>
+      <div class="info-top-ornament"></div>
+      <button id="closeInfo">&times;</button>
+      <canvas id="infoItemCanvas" width="64" height="64"></canvas>
+      <div id="infoBody"></div>
+    </div>
+  </div>
+
+  <div id="convergeOverlay" class="hidden">
+    <div class="converge-text">
+      <span class="converge-main">中华民族共同体</span>
+      <span class="converge-sub">the sense of community<br>for the Chinese nation</span>
+      <button class="converge-btn" id="convergeResetBtn">⟳ 重新浏览</button>
+    </div>
+  </div>
+
+  <!-- Welcome overlay -->
+  <div id="welcomeOverlay">
+    <div class="welcome-content">
+      <div class="welcome-title">
+        <span class="welcome-title-num">56个民族</span>
+        <span class="welcome-title-divider"><span>◆</span></span>
+        <span class="welcome-title-sub">文化图鉴</span>
+      </div>
+      <div class="welcome-desc">
+        <span>集齐56枚民族徽章</span>
+        <em></em>
+        <span>感知每一种民族文化美学</span>
+      </div>
+      <button class="welcome-btn" id="welcomeDrawBtn">
+        <span class="welcome-btn-star">✦</span>
+        <span class="welcome-btn-text">开始探索</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Tutorial overlay (2-step onboarding) -->
+  <div id="tutorialOverlay" class="hidden">
+    <div class="tutorial-scrim"></div>
+    <div class="tutorial-card">
+      <div class="tutorial-step-icon" id="tutorialIcon">&#10022;</div>
+      <div class="tutorial-step-title" id="tutorialTitle">邂逅</div>
+      <div class="tutorial-step-desc" id="tutorialDesc">点击底部「邂逅」探索新的民族，每次邂逅随机遇见一个民族</div>
+      <div class="tutorial-dots" id="tutorialDots">
+        <span class="dot active"></span>
+        <span class="dot"></span>
+      </div>
+      <button class="tutorial-btn" id="tutorialNextBtn">下一步</button>
+    </div>
+  </div>
+
+  <!-- Draw card flip overlay -->
+  <div id="drawOverlay" class="hidden">
+    <div class="draw-scrim"></div>
+    <div class="draw-card-frame">
+      <div class="draw-card-inner" id="drawCardInner">
+        <div class="draw-card-back">
+          <div class="draw-pattern"></div>
+          <div class="draw-question">?</div>
+          <div class="draw-hint">邂逅中...</div>
+        </div>
+        <div class="draw-card-front">
+          <div class="draw-front-bar" id="drawFrontBar"></div>
+          <canvas id="drawCardCanvas" width="140" height="140"></canvas>
+          <div class="draw-front-name" id="drawFrontName"></div>
+          <div class="draw-front-roman" id="drawFrontRoman"></div>
+          <div class="draw-front-label" id="drawFrontLabel"></div>
+        </div>
+      </div>
+    </div>
+    <div class="draw-progress-text" id="drawProgressText"></div>
+  </div>
+
+  <!-- Album panel -->
+  <div id="albumPanel" class="hidden">
+    <div class="album-scrim"></div>
+    <div class="album-container">
+      <div class="album-header">
+        <div class="album-title-group">
+          <h2 class="album-title">民族文化图鉴</h2>
+          <span class="album-count"><span id="collectedCount">0</span> / 56 已收集</span>
+        </div>
+        <div class="album-header-actions">
+          <button id="resetProgress" class="album-reset-btn" title="重置收集进度">⟳</button>
+          <button id="closeAlbum">&times;</button>
+        </div>
+      </div>
+      <div id="albumGrid"></div>
+    </div>
+  </div>
+
+  <div id="loadingOverlay">
+    <div class="loader"></div>
+    <p>正在启动摄像头...</p>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.3.1675466862/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils@0.3.1675466124/drawing_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/hands.js" crossorigin="anonymous"></script>
+
+  <div class="ai-footer">部分内容由AI基于现实资料生成，如有错误恳请指正</div>
+
+  <script src="js/ethnic-data.js"></script>
+  <script src="js/collection.js"></script>
+  <script src="js/visual.js?v=2"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
